@@ -10,6 +10,10 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
 
+import in.conceptarchitect.exceptions.InsufficientFundsException;
+import in.conceptarchitect.exceptions.InvalidAccountException;
+import in.conceptarchitect.exceptions.InvalidCredentialsException;
+
 public class BankInternalImplementationTests {
 	Bank bank;
 	double interestRate=12;
@@ -43,7 +47,7 @@ public class BankInternalImplementationTests {
 	@Before
 	public void setup() {
 		//ARRANGE
-		bank=new Bank("ICICI",interestRate);
+		bank=new Bank("ICICI",interestRate, amount);
 		a1=bank.openAccount("a1","savings",correctPassword,amount);
 		a2=bank.openAccount("a2","current",correctPassword,amount);
 		totalAccounts=bank.getAccountCount();
@@ -63,14 +67,14 @@ public class BankInternalImplementationTests {
 	}
 	
 	@Test
-	public void closeAccount_removesClosedAccount() {
+	public void closeAccount_removesClosedAccount() throws InvalidAccountException, InvalidCredentialsException, InsufficientFundsException {
 		
 		bank.closeAccount(a1, correctPassword);		
 		assertNull(bank.getAccountByNumber(a1));
 	}
 
 	@Test
-	public void closeAccount_failsForAccountWithNegativeBalance() {
+	public void closeAccount_failsForAccountWithNegativeBalance() throws InvalidAccountException, InvalidCredentialsException, InsufficientFundsException {
 		//Arrange
 		var account=bank.getAccountByNumber(a1);
 		account.balance=-1; //because I am in the same package I can do this logic
@@ -85,7 +89,7 @@ public class BankInternalImplementationTests {
 	
 	
 	@Test
-	public void accountNumbersAreAlwaysUnique() {
+	public void accountNumbersAreAlwaysUnique() throws InvalidAccountException, InvalidCredentialsException, InsufficientFundsException {
 		
 		//Arrange
 		bank.closeAccount(a1, correctPassword);

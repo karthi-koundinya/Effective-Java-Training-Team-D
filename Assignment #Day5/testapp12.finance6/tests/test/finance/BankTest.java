@@ -9,6 +9,9 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import in.conceptarchitect.exceptions.InsufficientFundsException;
+import in.conceptarchitect.exceptions.InvalidAccountException;
+import in.conceptarchitect.exceptions.InvalidCredentialsException;
 import in.conceptarchitect.finance.Bank;
 
 public class BankTest {
@@ -46,7 +49,7 @@ public class BankTest {
 	@Before
 	public void setup() {
 		//ARRANGE
-		bank=new Bank("ICICI",interestRate);
+		bank=new Bank("ICICI",interestRate, amount);
 		a1=bank.openAccount("one","savings",correctPassword,amount);
 		a2=bank.openAccount("one","current",correctPassword,amount);
 		totalAccounts=bank.getAccountCount();
@@ -79,7 +82,7 @@ public class BankTest {
 	
 	//@Ignore
 	@Test
-	public void deposit_shouldWorkForValidAmountAndAccountNumber() {
+	public void deposit_shouldWorkForValidAmountAndAccountNumber() throws InvalidAccountException, InsufficientFundsException {
 		
 //		boolean result = bank.deposit(a1, 1);
 		
@@ -93,7 +96,7 @@ public class BankTest {
 	
 	//@Ignore
 	@Test
-	public void deposit_shouldFailForInvalidAmount() {
+	public void deposit_shouldFailForInvalidAmount() throws InvalidAccountException, InsufficientFundsException {
 //		boolean result= bank.deposit(a1, -1);
 //		assertFalse(result);
 //		assertEquals(amount, bank.getAccountBalance(a1),0.01);
@@ -104,7 +107,7 @@ public class BankTest {
 	
 	//@Ignore
 	@Test
-	public void deposit_shouldFailForInvalidAccountNumber() {
+	public void deposit_shouldFailForInvalidAccountNumber() throws InvalidAccountException, InsufficientFundsException {
 		boolean result=bank.deposit(1000, 1);
 		assertFalse(result);		
 	}
@@ -157,7 +160,7 @@ public class BankTest {
 	
 	//@Ignore
 	@Test
-	public void withdraw_shouldWorkWithValidDetails() {
+	public void withdraw_shouldWorkWithValidDetails() throws InvalidAccountException {
 		
 		boolean status = bank.transfer(a1,1,correctPassword,a2);
 		
@@ -168,7 +171,7 @@ public class BankTest {
 	
 	//@Ignore
 	@Test
-	public void transfer_shouldFailForInvalidAmount() {
+	public void transfer_shouldFailForInvalidAmount() throws InvalidAccountException {
 		boolean result= bank.transfer(a1, -1, correctPassword, a2);
 		assertTransactionFailed(result, a1);
 		assertTransactionFailed(result, a2);
@@ -176,7 +179,7 @@ public class BankTest {
 	
 	//@Ignore
 	@Test
-	public void transfer_shouldFailForInvalidSourceAccountNumber() {
+	public void transfer_shouldFailForInvalidSourceAccountNumber() throws InvalidAccountException {
 		boolean result=bank.transfer(-1, 1, correctPassword, a2);
 		
 		assertTransactionFailed(result, a2);
@@ -184,7 +187,7 @@ public class BankTest {
 	
 	//@Ignore
 	@Test
-	public void transfer_shouldFailForInvalidTargetAccountNumber() {
+	public void transfer_shouldFailForInvalidTargetAccountNumber() throws InvalidAccountException {
 		boolean result=bank.transfer(a1, 1, correctPassword, -1);
 		
 		
@@ -195,7 +198,7 @@ public class BankTest {
 	
 	//@Ignore
 	@Test
-	public void transfer_shouldFailForInvalidPassword() {
+	public void transfer_shouldFailForInvalidPassword() throws InvalidAccountException {
 		var result= bank.transfer(a1, 1, "invalid-password", a2);
 		assertTransactionFailed(result, a1);
 		assertTransactionFailed(result, a2);
@@ -204,7 +207,7 @@ public class BankTest {
 	
 	//@Ignore
 	@Test
-	public void transfer_shouldFailForExcessAmount() {
+	public void transfer_shouldFailForExcessAmount() throws InvalidAccountException {
 		var result=bank.transfer(a1, amount+1, correctPassword, a2);
 		assertTransactionFailed(result, a1);
 		assertTransactionFailed(result, a2);
@@ -214,7 +217,7 @@ public class BankTest {
 	
 	//@Ignore
 	@Test
-	public void closeAccount_shouldWorkdInHappyPath() {
+	public void closeAccount_shouldWorkdInHappyPath() throws InvalidAccountException, InvalidCredentialsException, InsufficientFundsException {
 		var result= bank.closeAccount(a1,correctPassword);		
 		assertTrue(result);
 		//assertEquals(Double.NaN, bank.getAccountBalance(a1),0,0);
@@ -222,7 +225,7 @@ public class BankTest {
 	
 	@Ignore
 	@Test
-	public void closeAccount_shouldDecreaseTheAccountCount() {
+	public void closeAccount_shouldDecreaseTheAccountCount() throws InvalidAccountException, InvalidCredentialsException, InsufficientFundsException {
 		var result=bank.closeAccount(a1,correctPassword);		
 		assertEquals(totalAccounts-1, bank.getAccountCount());
 	}
@@ -230,14 +233,14 @@ public class BankTest {
 	
 	//@Ignore
 	@Test
-	public void closeAccount_shouldFailForInvalidPassword() {
+	public void closeAccount_shouldFailForInvalidPassword() throws InvalidAccountException, InvalidCredentialsException, InsufficientFundsException {
 		boolean result= bank.closeAccount(a1, "incorrect-password");
 		assertEquals(false,result);
 	}
 	
 	//@Ignore
 	@Test
-	public void closeAccount_shouldFailForNegativeBalance() {
+	public void closeAccount_shouldFailForNegativeBalance() throws InvalidAccountException, InvalidCredentialsException, InsufficientFundsException {
 		assumeTrue(bank.getAccountBalance(a1)<0);
 		
 		boolean result=bank.closeAccount(a1, correctPassword);
@@ -246,14 +249,14 @@ public class BankTest {
 	
 	//@Ignore
 	@Test
-	public void closeAccount_shouldFailForInvalidAccountNumber() {
+	public void closeAccount_shouldFailForInvalidAccountNumber() throws InvalidAccountException, InvalidCredentialsException, InsufficientFundsException {
 		boolean result=bank.closeAccount(-1, correctPassword);
 		assertEquals(false,result);
 	}
 	
 	//@Ignore
 	@Test
-	public void closeAccount_cantCloseSameAccountTwice() {
+	public void closeAccount_cantCloseSameAccountTwice() throws InvalidAccountException, InvalidCredentialsException, InsufficientFundsException {
 	
 		boolean result=bank.closeAccount(a1, correctPassword);
 		assumeTrue(result); //it is closed the first time

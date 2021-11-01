@@ -1,5 +1,8 @@
 package in.conceptarchitect.machines;
 
+import in.conceptarchitect.exceptions.InsufficientFundsException;
+import in.conceptarchitect.exceptions.InvalidAccountException;
+import in.conceptarchitect.exceptions.InvalidCredentialsException;
 import in.conceptarchitect.finance.Bank;
 
 public class ATM {
@@ -60,12 +63,12 @@ public class ATM {
 	private void doOpenAccount() {
 		// TODO Auto-generated method stub
 		String name=keyboard.readString("Name? ");
-		String accountType=keyboard.readString("Account Type? ");
+		String accountType=keyboard.readString("Account Type? (savings,current,overdraft)");
 		String password=keyboard.readString("Password:");
 		int amount=keyboard.readInt("Amount?");
-		
 		int accountNumber=bank.openAccount(name,accountType,password, amount);
 		printSlip("Your new account number is "+accountNumber);
+		printSlip("Succufully created "+accountType+ " Bank account");
 	}
 
 	private void mainMenu() {
@@ -93,12 +96,18 @@ public class ATM {
 		// TODO Auto-generated method stub
 		String password=keyboard.readString("ENTER YOUR PASSWORD:");
 		double amount=bank.getAccountBalance(accountNumber);
-		if(bank.closeAccount(accountNumber, password))
-		{
-			printSlip("Account Closed. Cash Returned");
-			dispenseCash((int)amount);
-		} else {
-			printMessage("Account close Failed");
+		try {
+			if(bank.closeAccount(accountNumber, password))
+			{
+				printSlip("Account Closed. Cash Returned");
+				dispenseCash((int)amount);
+			} else {
+				printMessage("Account close Failed");
+			}
+		} catch (InvalidAccountException | InvalidCredentialsException | InsufficientFundsException e) {
+			// TODO Auto-generated catch block
+			System.out.println(e.getMessage());  
+            System.out.println("TRANSACTION FAILURE");
 		}
 			
 	}
@@ -119,10 +128,16 @@ public class ATM {
 		int amount=keyboard.readInt("amount to transfer? ");
 		String password=keyboard.readString("password? ");
 		int targetAccount=keyboard.readInt("target account?");
-		if(bank.transfer(accountNumber, amount, password, targetAccount))
-			printSlip("Amount Transferred");
-		else
-			printMessage("Transfer Failed");
+		try {
+			if(bank.transfer(accountNumber, amount, password, targetAccount))
+				printSlip("Amount Transferred");
+			else
+				printMessage("Transfer Failed");
+		} catch (InvalidAccountException e) {
+			// TODO Auto-generated catch block
+			System.out.println(e.getMessage());  
+            System.out.println("TRANSACTION FAILURE"); 
+		}
 	}
 
 	private void doWithdraw() {
@@ -131,10 +146,16 @@ public class ATM {
 		int amount=keyboard.readInt("amount to transfer? ");
 		String password=keyboard.readString("password? ");
 		
-		if(bank.withdraw(accountNumber, amount, password))
-			dispenseCash(amount);
-		else
-			printMessage("Withdraw Failed");
+		try {
+			if(bank.withdraw(accountNumber, amount, password))
+				dispenseCash(amount);
+			else
+				printMessage("Withdraw Failed");
+		} catch (InvalidCredentialsException | InsufficientFundsException e) {
+			// TODO Auto-generated catch block
+			 System.out.println(e.getMessage());  
+             System.out.println("TRANSACTION FAILURE");  
+		}
 		
 	}
 
@@ -142,10 +163,16 @@ public class ATM {
 		// TODO Auto-generated method stub
 
 		int amount=keyboard.readInt("amount to transfer? ");
-		if(bank.deposit(accountNumber, amount))
-			printSlip("Amount Deposited");
-		else
-			printMessage("Transfer Failed");
+		try {
+			if(bank.deposit(accountNumber, amount))
+				printSlip("Amount Deposited");
+			else
+				printMessage("Transfer Failed");
+		} catch (InvalidAccountException | InsufficientFundsException e) {
+			// TODO Auto-generated catch block
+			 System.out.println(e.getMessage());  
+             System.out.println("TRANSACTION FAILURE");  
+		}
 	}
 	
 	//ATM hardware methods
