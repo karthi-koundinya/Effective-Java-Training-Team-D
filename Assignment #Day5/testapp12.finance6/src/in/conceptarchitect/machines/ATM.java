@@ -60,10 +60,9 @@ public class ATM {
 	private void doOpenAccount() {
 		// TODO Auto-generated method stub
 		String name=keyboard.readString("Name? ");
-		String accountType=keyboard.readString("Account Type? ");
+		String accountType=keyboard.readString("Account Type? (savings,current,overdraft)");
 		String password=keyboard.readString("Password:");
 		int amount=keyboard.readInt("Amount?");
-		
 		int accountNumber=bank.openAccount(name,accountType,password, amount);
 		printSlip("Your new account number is "+accountNumber);
 		printSlip("Succufully created "+accountType+ " Bank account");
