@@ -66,6 +66,7 @@ public class ATM {
 		
 		int accountNumber=bank.openAccount(name,accountType,password, amount);
 		printSlip("Your new account number is "+accountNumber);
+		printSlip("Succufully created "+accountType+ " Bank account");
 	}
 
 	private void mainMenu() {
